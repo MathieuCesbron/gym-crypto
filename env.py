@@ -2,13 +2,13 @@ import numpy as np
 import gym
 import random
 from gym import spaces
-from static import *
+import static
 
 
 class CryptoEnv(gym.Env):
     def __init__(self, df):
         self.df = df
-        self.reward_range = (0, MAX_ACCOUNT_BALANCE)
+        self.reward_range = (0, static.MAX_ACCOUNT_BALANCE)
         # Could be remove when more data will be added
         self.crypto_held = 0
         # Action space from -1 to 1, -1 is short, 1 is buy
@@ -19,26 +19,42 @@ class CryptoEnv(gym.Env):
         # Observation space contains only the actual price for the moment
         self.observation_space = spaces.Box(low=0,
                                             high=1,
-                                            shape=(1, ),
+                                            shape=(1, 11),
                                             dtype=np.float16)
 
     def reset(self):
-        self.balance = INITIAL_ACCOUNT_BALANCE
-        self.net_worth = INITIAL_ACCOUNT_BALANCE
-        self.max_net_worth = INITIAL_ACCOUNT_BALANCE
+        self.balance = static.INITIAL_ACCOUNT_BALANCE
+        self.net_worth = static.INITIAL_ACCOUNT_BALANCE
+        self.max_net_worth = static.INITIAL_ACCOUNT_BALANCE
         self.current_step = 0
 
         return self._next_observation()
 
     def _next_observation(self):
         #Get the actual price and scale it
-        frame = np.array(
-            [self.df.loc[self.current_step, 'open'] / MAX_BTC_PRICE])
+        frame = np.array([
+            self.df.loc[self.current_step, 'open'] / static.MAX_CRYPTO_PRICE,
+            self.df.loc[self.current_step, 'high'] / static.MAX_CRYPTO_PRICE,
+            self.df.loc[self.current_step, 'low'] / static.MAX_CRYPTO_PRICE,
+            self.df.loc[self.current_step, 'close'] / static.MAX_CRYPTO_PRICE,
+            self.df.loc[self.current_step, 'volume'] / static.MAX_CRYPTO_PRICE,
+            self.df.loc[self.current_step, 'quote_asset_volume'] /
+            static.MAX_QUOTE_ASSET_VOLUME,
+            self.df.loc[self.current_step, 'number_of_trades'] /
+            static.MAX_NUMBER_of_TRADES,
+            self.df.loc[self.current_step, 'taker_buy_base_asset_volume'] /
+            static.MAX_TAKER_BUY_BASE_ASSET_VOLUME,
+            self.df.loc[self.current_step, 'taker_buy_quote_asset_volume'] /
+            static.MAX_TAKER_BUY_QUOTE_ASSET_VOLUME
+        ])
 
         # We will Append additional data to render after
-        obs = np.append(frame, "add_data")
+        obs = np.append(frame, [[
+            self.balance / static.MAX_ACCOUNT_BALANCE,
+            self.net_worth / self.max_net_worth
+        ]])
 
-        return frame
+        return obs
 
     def _take_action(self, action):  #pylint: disable=method-hidden
         # Set the current price to a random price between open and close
@@ -72,7 +88,7 @@ class CryptoEnv(gym.Env):
         if self.current_step > len(self.df.loc[:, 'open'].values) - 1:
             self.current_step = 0
 
-        delay_modifier = self.current_step / MAX_STEPS
+        delay_modifier = self.current_step / static.MAX_STEPS
 
         # Is it net_worth or balance ?
         reward = self.net_worth * delay_modifier
@@ -84,10 +100,12 @@ class CryptoEnv(gym.Env):
         return obs, reward, done, {}
 
     def render(self):
-        profit = self.net_worth - INITIAL_ACCOUNT_BALANCE
+        profit = self.net_worth - static.INITIAL_ACCOUNT_BALANCE
 
+        print("----------------------------------------")
         print("Step: " + str(self.current_step))
         print("Balance: " + str(self.balance))
         print("Crypto held: " + str(self.crypto_held))
         print("Net worth: " + str(self.net_worth))
+        print("Max net worth: " + str(self.max_net_worth))
         print("Profit: " + str(profit))

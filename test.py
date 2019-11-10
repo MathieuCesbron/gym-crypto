@@ -1,4 +1,5 @@
-import numpy as np
+import pandas as pd
 
-a = np.array([[1, 2, 3], [2, 2, 3]])
-print(a.shape)
+df = pd.read_csv('data/BTCUSDT.csv')
+aya = df.loc[df['high'].idxmax()]['high']
+print(aya)
