@@ -9,6 +9,7 @@ class CryptoEnv(gym.Env):
     def __init__(self, df):
         self.df = df
         self.reward_range = (0, static.MAX_ACCOUNT_BALANCE)
+        self.total_fees = 0
         # Could be remove when more data will be added
         self.crypto_held = 0
         # Action space from -1 to 1, -1 is short, 1 is buy
@@ -26,6 +27,8 @@ class CryptoEnv(gym.Env):
         self.balance = static.INITIAL_ACCOUNT_BALANCE
         self.net_worth = static.INITIAL_ACCOUNT_BALANCE
         self.max_net_worth = static.INITIAL_ACCOUNT_BALANCE
+        self.total_fees = 0
+        self.crypto_held = 0
         self.current_step = 0
 
         return self._next_observation()
@@ -61,15 +64,17 @@ class CryptoEnv(gym.Env):
         current_price = random.uniform(self.df.loc[self.current_step, 'open'],
                                        self.df.loc[self.current_step, 'close'])
 
-        if action > 0:
+        if action[0] > 0:
             # Buy
-            crypto_bought = self.balance * action / current_price
+            crypto_bought = self.balance * action[0] / current_price
+            self.total_fees = crypto_bought * current_price * static.MAKER_FEE
             self.balance -= crypto_bought * current_price
             self.crypto_held += crypto_bought
 
-        if action < 0:
+        if action[0] < 0:
             # Sell
-            crypto_sold = -self.crypto_held * action
+            crypto_sold = -self.crypto_held * action[0]
+            self.total_fees += crypto_sold * current_price * static.TAKER_FEE
             self.balance += crypto_sold * current_price
             self.crypto_held -= crypto_sold
 
@@ -106,6 +111,7 @@ class CryptoEnv(gym.Env):
         print("Step: " + str(self.current_step))
         print("Balance: " + str(self.balance))
         print("Crypto held: " + str(self.crypto_held))
+        print("Fees paid: " + str(self.total_fees))
         print("Net worth: " + str(self.net_worth))
         print("Max net worth: " + str(self.max_net_worth))
         print("Profit: " + str(profit))
