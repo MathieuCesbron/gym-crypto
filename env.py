@@ -10,6 +10,7 @@ class CryptoEnv(gym.Env):
         self.df = df
         self.reward_range = (0, static.MAX_ACCOUNT_BALANCE)
         self.total_fees = 0
+        self.total_volume_traded = 0
         # Could be remove when more data will be added
         self.crypto_held = 0
         # Action space from -1 to 1, -1 is short, 1 is buy
@@ -28,6 +29,7 @@ class CryptoEnv(gym.Env):
         self.net_worth = static.INITIAL_ACCOUNT_BALANCE
         self.max_net_worth = static.INITIAL_ACCOUNT_BALANCE
         self.total_fees = 0
+        self.total_volume_traded = 0
         self.crypto_held = 0
         self.current_step = 0
 
@@ -67,14 +69,20 @@ class CryptoEnv(gym.Env):
         if action[0] > 0:
             # Buy
             crypto_bought = self.balance * action[0] / current_price
-            self.total_fees = crypto_bought * current_price * static.MAKER_FEE
+            print("bought")
+            print(crypto_bought)
+            self.total_fees += crypto_bought * current_price * static.MAKER_FEE
+            self.total_volume_traded += crypto_bought * current_price
             self.balance -= crypto_bought * current_price
             self.crypto_held += crypto_bought
 
         if action[0] < 0:
             # Sell
             crypto_sold = -self.crypto_held * action[0]
+            print("sold")
+            print(crypto_sold)
             self.total_fees += crypto_sold * current_price * static.TAKER_FEE
+            self.total_volume_traded += crypto_sold * current_price
             self.balance += crypto_sold * current_price
             self.crypto_held -= crypto_sold
 
@@ -112,6 +120,7 @@ class CryptoEnv(gym.Env):
         print("Balance: " + str(self.balance))
         print("Crypto held: " + str(self.crypto_held))
         print("Fees paid: " + str(self.total_fees))
+        print("Volume traded: " + str(self.total_volume_traded))
         print("Net worth: " + str(self.net_worth))
         print("Max net worth: " + str(self.max_net_worth))
         print("Profit: " + str(profit))
