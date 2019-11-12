@@ -69,8 +69,6 @@ class CryptoEnv(gym.Env):
         if action[0] > 0:
             # Buy
             crypto_bought = self.balance * action[0] / current_price
-            print("bought")
-            print(crypto_bought)
             self.total_fees += crypto_bought * current_price * static.MAKER_FEE
             self.total_volume_traded += crypto_bought * current_price
             self.balance -= crypto_bought * current_price
@@ -79,8 +77,6 @@ class CryptoEnv(gym.Env):
         if action[0] < 0:
             # Sell
             crypto_sold = -self.crypto_held * action[0]
-            print("sold")
-            print(crypto_sold)
             self.total_fees += crypto_sold * current_price * static.TAKER_FEE
             self.total_volume_traded += crypto_sold * current_price
             self.balance += crypto_sold * current_price
