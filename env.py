@@ -21,7 +21,7 @@ class CryptoEnv(gym.Env):
         # Observation space contains only the actual price for the moment
         self.observation_space = spaces.Box(low=0,
                                             high=1,
-                                            shape=(1, 11),
+                                            shape=(10, 5),
                                             dtype=np.float16)
 
     def reset(self):
@@ -31,33 +31,44 @@ class CryptoEnv(gym.Env):
         self.total_fees = 0
         self.total_volume_traded = 0
         self.crypto_held = 0
-        self.current_step = 0
+        self.current_step = 4
 
         return self._next_observation()
 
     def _next_observation(self):
-        #Get the actual price and scale it
+        #Get the data for the last 5 timestep
         frame = np.array([
-            self.df.loc[self.current_step, 'open'] / static.MAX_CRYPTO_PRICE,
-            self.df.loc[self.current_step, 'high'] / static.MAX_CRYPTO_PRICE,
-            self.df.loc[self.current_step, 'low'] / static.MAX_CRYPTO_PRICE,
-            self.df.loc[self.current_step, 'close'] / static.MAX_CRYPTO_PRICE,
-            self.df.loc[self.current_step, 'volume'] / static.MAX_CRYPTO_PRICE,
-            self.df.loc[self.current_step, 'quote_asset_volume'] /
+            self.df.loc[self.current_step - 4:self.current_step, 'open'] /
+            static.MAX_CRYPTO_PRICE,
+            self.df.loc[self.current_step - 4:self.current_step, 'high'] /
+            static.MAX_CRYPTO_PRICE,
+            self.df.loc[self.current_step - 4:self.current_step, 'low'] /
+            static.MAX_CRYPTO_PRICE,
+            self.df.loc[self.current_step - 4:self.current_step, 'close'] /
+            static.MAX_CRYPTO_PRICE,
+            self.df.loc[self.current_step - 4:self.current_step, 'volume'] /
+            static.MAX_CRYPTO_PRICE,
+            self.df.loc[self.current_step -
+                        4:self.current_step, 'quote_asset_volume'] /
             static.MAX_QUOTE_ASSET_VOLUME,
-            self.df.loc[self.current_step, 'number_of_trades'] /
+            self.df.loc[self.current_step -
+                        4:self.current_step, 'number_of_trades'] /
             static.MAX_NUMBER_of_TRADES,
-            self.df.loc[self.current_step, 'taker_buy_base_asset_volume'] /
+            self.df.loc[self.current_step -
+                        4:self.current_step, 'taker_buy_base_asset_volume'] /
             static.MAX_TAKER_BUY_BASE_ASSET_VOLUME,
-            self.df.loc[self.current_step, 'taker_buy_quote_asset_volume'] /
+            self.df.loc[self.current_step -
+                        4:self.current_step, 'taker_buy_quote_asset_volume'] /
             static.MAX_TAKER_BUY_QUOTE_ASSET_VOLUME
         ])
 
         # We will Append additional data to render after
         obs = np.append(frame, [[
             self.balance / static.MAX_ACCOUNT_BALANCE,
-            self.net_worth / self.max_net_worth
-        ]])
+            self.net_worth / self.max_net_worth,
+            self.crypto_held / static.MAX_CRYPTO,
+            0, 0
+        ]], axis=0)
 
         return obs
 
