@@ -97,7 +97,7 @@ class CryptoEnv(gym.Env):
 
         # Will be updated later (may be remove -1)
         if self.current_step > len(self.df.loc[:, 'Open'].values) - 1:
-            self.current_step = 0
+            self.current_step = 4
 
         delay_modifier = self.current_step / static.MAX_STEPS
 
