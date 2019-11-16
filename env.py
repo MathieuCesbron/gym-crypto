@@ -38,44 +38,35 @@ class CryptoEnv(gym.Env):
     def _next_observation(self):
         #Get the data for the last 5 timestep
         frame = np.array([
-            self.df.loc[self.current_step - 4:self.current_step, 'open'] /
-            static.MAX_CRYPTO_PRICE,
-            self.df.loc[self.current_step - 4:self.current_step, 'high'] /
-            static.MAX_CRYPTO_PRICE,
-            self.df.loc[self.current_step - 4:self.current_step, 'low'] /
-            static.MAX_CRYPTO_PRICE,
-            self.df.loc[self.current_step - 4:self.current_step, 'close'] /
-            static.MAX_CRYPTO_PRICE,
-            self.df.loc[self.current_step - 4:self.current_step, 'volume'] /
-            static.MAX_CRYPTO_PRICE,
+            self.df.loc[self.current_step - 4:self.current_step, 'Open'],
+            self.df.loc[self.current_step - 4:self.current_step, 'High'],
+            self.df.loc[self.current_step - 4:self.current_step, 'Low'],
+            self.df.loc[self.current_step - 4:self.current_step, 'Close'],
+            self.df.loc[self.current_step - 4:self.current_step, 'Volume'],
             self.df.loc[self.current_step -
-                        4:self.current_step, 'quote_asset_volume'] /
-            static.MAX_QUOTE_ASSET_VOLUME,
+                        4:self.current_step, 'Quote asset volume'],
             self.df.loc[self.current_step -
-                        4:self.current_step, 'number_of_trades'] /
-            static.MAX_NUMBER_of_TRADES,
+                        4:self.current_step, 'Number of trades'],
             self.df.loc[self.current_step -
-                        4:self.current_step, 'taker_buy_base_asset_volume'] /
-            static.MAX_TAKER_BUY_BASE_ASSET_VOLUME,
+                        4:self.current_step, 'Taker buy base asset volume'],
             self.df.loc[self.current_step -
-                        4:self.current_step, 'taker_buy_quote_asset_volume'] /
-            static.MAX_TAKER_BUY_QUOTE_ASSET_VOLUME
+                        4:self.current_step, 'Taker buy quote asset volume']
         ])
 
         # We will Append additional data to render after
         obs = np.append(frame, [[
-            self.balance / static.MAX_ACCOUNT_BALANCE,
-            self.net_worth / self.max_net_worth,
-            self.crypto_held / static.MAX_CRYPTO,
-            0, 0
-        ]], axis=0)
+            self.balance / static.MAX_ACCOUNT_BALANCE, self.net_worth /
+            self.max_net_worth, self.crypto_held / static.MAX_CRYPTO, 0, 0
+        ]],
+                        axis=0)
 
         return obs
 
     def _take_action(self, action):  #pylint: disable=method-hidden
         # Set the current price to a random price between open and close
-        current_price = random.uniform(self.df.loc[self.current_step, 'open'],
-                                       self.df.loc[self.current_step, 'close'])
+        current_price = random.uniform(
+            self.df.loc[self.current_step, 'Real open'],
+            self.df.loc[self.current_step, 'Real close'])
 
         if action[0] > 0:
             # Buy
@@ -105,7 +96,7 @@ class CryptoEnv(gym.Env):
         self.current_step += 1
 
         # Will be updated later (may be remove -1)
-        if self.current_step > len(self.df.loc[:, 'open'].values) - 1:
+        if self.current_step > len(self.df.loc[:, 'Open'].values) - 1:
             self.current_step = 0
 
         delay_modifier = self.current_step / static.MAX_STEPS

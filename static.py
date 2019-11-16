@@ -3,16 +3,16 @@ import pandas as pd
 df = pd.read_csv('data/BTCUSDT.csv')
 
 MAX_QUOTE_ASSET_VOLUME = df.loc[
-    df['quote_asset_volume'].idxmax()]['quote_asset_volume']
+    df['Quote asset volume'].idxmax()]['Quote asset volume']
 
 MAX_NUMBER_of_TRADES = df.loc[
-    df['number_of_trades'].idxmax()]['number_of_trades']
+    df['Number of trades'].idxmax()]['Number of trades']
 
 MAX_TAKER_BUY_BASE_ASSET_VOLUME = df.loc[
-    df['taker_buy_base_asset_volume'].idxmax()]['taker_buy_base_asset_volume']
+    df['Taker buy base asset volume'].idxmax()]['Taker buy base asset volume']
 
 MAX_TAKER_BUY_QUOTE_ASSET_VOLUME = df.loc[df[
-    'taker_buy_quote_asset_volume'].idxmax()]['taker_buy_quote_asset_volume']
+    'Taker buy quote asset volume'].idxmax()]['Taker buy quote asset volume']
 
 MAX_ACCOUNT_BALANCE = 10000000
 INITIAL_ACCOUNT_BALANCE = 1000
