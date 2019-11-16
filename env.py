@@ -105,7 +105,8 @@ class CryptoEnv(gym.Env):
         delay_modifier = self.current_step / static.MAX_STEPS
 
         reward = self.net_worth * delay_modifier
-        done = self.net_worth <= 0 and self.bnb_usdt_held <= 0
+        done = self.net_worth <= 0 or self.bnb_usdt_held <= 0
+        print(self.bnb_usdt_held)
 
         obs = self._next_observation()
 
