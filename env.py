@@ -33,7 +33,12 @@ class CryptoEnv(gym.Env):
         self.total_volume_traded = 0
         self.crypto_held = 0
         self.bnb_usdt_held = static.BNBUSDTHELD
-        self.current_step = 4
+
+        # Set the current step to a random point within the data frame
+        self.current_step = random.randint(
+            0,
+            len(self.df.loc[:, 'Open'].values) + 4)
+        print(self.current_step)
 
         return self._next_observation()
 
