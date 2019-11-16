@@ -13,6 +13,7 @@ class CryptoEnv(gym.Env):
         self.total_volume_traded = 0
         self.crypto_held = 0
         self.bnb_usdt_held = static.BNBUSDTHELD
+        self.bnb_usdt_held_start = static.BNBUSDTHELD
         # Action space from -1 to 1, -1 is short, 1 is buy
         self.action_space = spaces.Box(low=-1,
                                        high=1,
@@ -57,7 +58,8 @@ class CryptoEnv(gym.Env):
         # We will Append additional data to render after
         obs = np.append(frame, [[
             self.balance / static.MAX_ACCOUNT_BALANCE, self.net_worth /
-            self.max_net_worth, self.crypto_held / static.MAX_CRYPTO, 0, 0
+            self.max_net_worth, self.crypto_held / static.MAX_CRYPTO,
+            self.bnb_usdt_held / self.bnb_usdt_held_start, 0
         ]],
                         axis=0)
 
@@ -106,7 +108,6 @@ class CryptoEnv(gym.Env):
 
         reward = self.net_worth * delay_modifier
         done = self.net_worth <= 0 or self.bnb_usdt_held <= 0
-        print(self.bnb_usdt_held)
 
         obs = self._next_observation()
 
