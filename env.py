@@ -8,7 +8,8 @@ import static
 class CryptoEnv(gym.Env):
     def __init__(self, df):
         self.df = df
-        self.reward_range = (0, static.MAX_ACCOUNT_BALANCE)
+        self.reward_range = (-static.MAX_ACCOUNT_BALANCE,
+                             static.MAX_ACCOUNT_BALANCE)
         self.total_fees = 0
         self.total_volume_traded = 0
         self.crypto_held = 0
@@ -39,6 +40,7 @@ class CryptoEnv(gym.Env):
         start = list(range(4, len(self.df.loc[:, 'Open'].values)))
         weights = [i**2 for i in start]
         self.current_step = random.choices(start, weights)[0]
+        self.start_step = self.current_step
 
         return self._next_observation()
 
@@ -110,9 +112,14 @@ class CryptoEnv(gym.Env):
                 0,
                 len(self.df.loc[:, 'Open'].values) + 4)
 
-        delay_modifier = self.current_step / static.MAX_STEPS
+        # Calculus of the reward
+        delay_modifier = (self.current_step -
+                          self.start_step) / static.MAX_STEPS
 
-        reward = self.net_worth * delay_modifier
+        profit = self.net_worth - (static.INITIAL_ACCOUNT_BALANCE +
+                                   static.BNBUSDTHELD)
+
+        reward = profit * delay_modifier
         done = self.net_worth <= 0 or self.bnb_usdt_held <= 0
 
         obs = self._next_observation()
