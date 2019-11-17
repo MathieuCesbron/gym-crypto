@@ -35,10 +35,17 @@ class CryptoEnv(gym.Env):
         self.bnb_usdt_held = static.BNBUSDTHELD
 
         # Set the current step to a random point within the data frame
+<<<<<<< HEAD
         # Weights of the current step follow the square function
         start = list(range(4, len(self.df.loc[:, 'Open'].values)))
         weights = [i**2 for i in start]
         self.current_step = random.choices(start, weights)[0]
+=======
+        self.current_step = random.randint(
+            0,
+            len(self.df.loc[:, 'Open'].values) + 4)
+        print(self.current_step)
+>>>>>>> c65b5ce1b2dad26be61a26d343c8da3868b05998
 
         return self._next_observation()
 
