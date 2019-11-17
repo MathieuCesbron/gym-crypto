@@ -11,8 +11,9 @@ class CryptoEnv(gym.Env):
         self.reward_range = (0, static.MAX_ACCOUNT_BALANCE)
         self.total_fees = 0
         self.total_volume_traded = 0
-        # Could be remove when more data will be added
         self.crypto_held = 0
+        self.bnb_usdt_held = static.BNBUSDTHELD
+        self.bnb_usdt_held_start = static.BNBUSDTHELD
         # Action space from -1 to 1, -1 is short, 1 is buy
         self.action_space = spaces.Box(low=-1,
                                        high=1,
@@ -26,12 +27,18 @@ class CryptoEnv(gym.Env):
 
     def reset(self):
         self.balance = static.INITIAL_ACCOUNT_BALANCE
-        self.net_worth = static.INITIAL_ACCOUNT_BALANCE
-        self.max_net_worth = static.INITIAL_ACCOUNT_BALANCE
+        self.net_worth = static.INITIAL_ACCOUNT_BALANCE + static.BNBUSDTHELD
+        self.max_net_worth = static.INITIAL_ACCOUNT_BALANCE + static.BNBUSDTHELD
         self.total_fees = 0
         self.total_volume_traded = 0
         self.crypto_held = 0
-        self.current_step = 4
+        self.bnb_usdt_held = static.BNBUSDTHELD
+
+        # Set the current step to a random point within the data frame
+        # Weights of the current step follow the square function
+        start = list(range(4, len(self.df.loc[:, 'Open'].values)))
+        weights = [i**2 for i in start]
+        self.current_step = random.choices(start, weights)[0]
 
         return self._next_observation()
 
@@ -56,7 +63,8 @@ class CryptoEnv(gym.Env):
         # We will Append additional data to render after
         obs = np.append(frame, [[
             self.balance / static.MAX_ACCOUNT_BALANCE, self.net_worth /
-            self.max_net_worth, self.crypto_held / static.MAX_CRYPTO, 0, 0
+            self.max_net_worth, self.crypto_held / static.MAX_CRYPTO,
+            self.bnb_usdt_held / self.bnb_usdt_held_start, 0
         ]],
                         axis=0)
 
@@ -71,6 +79,7 @@ class CryptoEnv(gym.Env):
         if action[0] > 0:
             # Buy
             crypto_bought = self.balance * action[0] / current_price
+            self.bnb_usdt_held -= crypto_bought * current_price * static.MAKER_FEE
             self.total_fees += crypto_bought * current_price * static.MAKER_FEE
             self.total_volume_traded += crypto_bought * current_price
             self.balance -= crypto_bought * current_price
@@ -79,12 +88,13 @@ class CryptoEnv(gym.Env):
         if action[0] < 0:
             # Sell
             crypto_sold = -self.crypto_held * action[0]
+            self.bnb_usdt_held -= crypto_sold * current_price * static.TAKER_FEE
             self.total_fees += crypto_sold * current_price * static.TAKER_FEE
             self.total_volume_traded += crypto_sold * current_price
             self.balance += crypto_sold * current_price
             self.crypto_held -= crypto_sold
 
-        self.net_worth = self.balance + self.crypto_held * current_price
+        self.net_worth = self.balance + self.crypto_held * current_price + self.bnb_usdt_held
 
         if self.net_worth > self.max_net_worth:
             self.max_net_worth = self.net_worth
@@ -95,15 +105,15 @@ class CryptoEnv(gym.Env):
 
         self.current_step += 1
 
-        # Will be updated later (may be remove -1)
         if self.current_step > len(self.df.loc[:, 'Open'].values) - 1:
-            self.current_step = 4
+            self.current_step = random.randint(
+                0,
+                len(self.df.loc[:, 'Open'].values) + 4)
 
         delay_modifier = self.current_step / static.MAX_STEPS
 
-        # Is it net_worth or balance ?
         reward = self.net_worth * delay_modifier
-        done = self.net_worth <= 0
+        done = self.net_worth <= 0 or self.bnb_usdt_held <= 0
 
         obs = self._next_observation()
 
@@ -111,7 +121,8 @@ class CryptoEnv(gym.Env):
         return obs, reward, done, {}
 
     def render(self):
-        profit = self.net_worth - static.INITIAL_ACCOUNT_BALANCE
+        profit = self.net_worth - (static.INITIAL_ACCOUNT_BALANCE +
+                                   static.BNBUSDTHELD)
 
         print("----------------------------------------")
         print("Step: " + str(self.current_step))

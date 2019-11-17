@@ -1,12 +1,12 @@
-# Standardize the data attributes for the Iris dataset.
-from sklearn.datasets import load_iris
-from sklearn import preprocessing
-# load the Iris dataset
-iris = load_iris()
-print(iris.data.shape)
-# separate the data and target attributes
-X = iris.data
-y = iris.target
-# standardize the data attributes
-standardized_X = preprocessing.scale(X)
-print(standardized_X)
+import random
+import pandas as pd
+
+df = pd.read_csv('data/BTCUSDT.csv')
+
+start = list(range(4, len(df.loc[:, 'Open'].values - 1)))
+weights = [i**2 for i in start]
+
+aya = random.choices(start, weights)
+
+for i in range(100):
+    print(random.choices(start, weights))
