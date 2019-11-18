@@ -120,7 +120,9 @@ class CryptoEnv(gym.Env):
                                    static.BNBUSDTHELD)
 
         reward = profit * delay_modifier
-        done = self.net_worth <= 0 or self.bnb_usdt_held <= 0
+
+        # A single episode can last a maximum of MAX_STEPS steps
+        done = self.net_worth <= 0 or self.bnb_usdt_held <= 0 or delay_modifier >= 1
 
         obs = self._next_observation()
 
