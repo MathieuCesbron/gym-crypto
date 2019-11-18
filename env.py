@@ -15,6 +15,7 @@ class CryptoEnv(gym.Env):
         self.crypto_held = 0
         self.bnb_usdt_held = static.BNBUSDTHELD
         self.bnb_usdt_held_start = static.BNBUSDTHELD
+        self.episode = 1
         # Action space from -1 to 1, -1 is short, 1 is buy
         self.action_space = spaces.Box(low=-1,
                                        high=1,
@@ -101,7 +102,7 @@ class CryptoEnv(gym.Env):
         if self.net_worth > self.max_net_worth:
             self.max_net_worth = self.net_worth
 
-    def step(self, action):
+    def step(self, action, render_episode=True):
         # Execute one time step within the environment
         self._take_action(action)
 
@@ -123,6 +124,10 @@ class CryptoEnv(gym.Env):
 
         # A single episode can last a maximum of MAX_STEPS steps
         done = self.net_worth <= 0 or self.bnb_usdt_held <= 0 or delay_modifier >= 1
+
+        if done and render_episode:
+            self.render_to_file()
+            self.episode += 1
 
         obs = self._next_observation()
 
@@ -151,3 +156,13 @@ class CryptoEnv(gym.Env):
         print("Profit: " + str(round(profit_percent, 2)) +
               "% ({})".format(round(profit, 2)))
         print("Benchmark profit : " + str(round(benchmark_profit, 2)) + "%")
+
+        return profit_percent, benchmark_profit
+
+    def render_to_file(self, filename='render.txt'):
+        file = open(filename, 'a')
+        file.write('-----------------------\n')
+        file.write(f'Episode numero: {self.episode}\n')
+        file.write(f'Profit: {round(self.render()[0], 2)}%\n')
+        file.write(f'Benchmark profit: {round(self.render()[1], 2)}%\n')
+        file.close()

@@ -14,7 +14,7 @@ model.learn(total_timesteps=2000)
 
 obs = env.reset()
 env.render()
-for i in range(2000):
+for i in range(3001):
     action, _states = model.predict(obs)
     obs, rewards, done, info = env.step(action)
     env.render()
