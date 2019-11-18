@@ -6,7 +6,7 @@ import static
 
 
 class CryptoEnv(gym.Env):
-    def __init__(self, df):
+    def __init__(self, df, title=None):
         self.df = df
         self.reward_range = (-static.MAX_ACCOUNT_BALANCE,
                              static.MAX_ACCOUNT_BALANCE)
@@ -35,6 +35,7 @@ class CryptoEnv(gym.Env):
         self.total_volume_traded = 0
         self.crypto_held = 0
         self.bnb_usdt_held = static.BNBUSDTHELD
+        self.episode_reward = 0
 
         # Set the current step to a random point within the data frame
         # Weights of the current step follow the square function
@@ -126,7 +127,8 @@ class CryptoEnv(gym.Env):
         done = self.net_worth <= 0 or self.bnb_usdt_held <= 0 or delay_modifier >= 1
 
         if done and render_episode:
-            self.render_to_file()
+            self.episode_reward = reward
+            self._render_episode()
             self.episode += 1
 
         obs = self._next_observation()
@@ -159,10 +161,11 @@ class CryptoEnv(gym.Env):
 
         return profit_percent, benchmark_profit
 
-    def render_to_file(self, filename='render.txt'):
+    def _render_episode(self, filename='render.txt'):
         file = open(filename, 'a')
         file.write('-----------------------\n')
         file.write(f'Episode numero: {self.episode}\n')
         file.write(f'Profit: {round(self.render()[0], 2)}%\n')
         file.write(f'Benchmark profit: {round(self.render()[1], 2)}%\n')
+        file.write(f'Reward: {round(self.episode_reward, 2)}\n')
         file.close()
