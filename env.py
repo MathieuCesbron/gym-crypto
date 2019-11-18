@@ -131,12 +131,21 @@ class CryptoEnv(gym.Env):
         profit = self.net_worth - (static.INITIAL_ACCOUNT_BALANCE +
                                    static.BNBUSDTHELD)
 
+        profit_percent = profit / (static.INITIAL_ACCOUNT_BALANCE +
+                                   static.BNBUSDTHELD) * 100
+
+        benchmark_profit = (self.df.loc[self.current_step, 'Real open'] /
+                            self.df.loc[self.start_step, 'Real open'] -
+                            1) * 100
+
         print("----------------------------------------")
         print("Step: " + str(self.current_step))
-        print("Balance: " + str(self.balance))
-        print("Crypto held: " + str(self.crypto_held))
-        print("Fees paid: " + str(self.total_fees))
-        print("Volume traded: " + str(self.total_volume_traded))
-        print("Net worth: " + str(self.net_worth))
-        print("Max net worth: " + str(self.max_net_worth))
-        print("Profit: " + str(profit))
+        print("Balance: " + str(round(self.balance, 2)))
+        print("Crypto held: " + str(round(self.crypto_held, 2)))
+        print("Fees paid: " + str(round(self.total_fees, 2)))
+        print("Volume traded: " + str(round(self.total_volume_traded, 2)))
+        print("Net worth: " + str(round(self.net_worth, 2)))
+        print("Max net worth: " + str(round(self.max_net_worth, 2)))
+        print("Profit: " + str(round(profit_percent, 2)) +
+              "% ({})".format(round(profit, 2)))
+        print("Benchmark profit : " + str(round(benchmark_profit, 2)) + "%")
