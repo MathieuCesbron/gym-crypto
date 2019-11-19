@@ -39,7 +39,7 @@ class CryptoEnv(gym.Env):
 
         # Set the current step to a random point within the data frame
         # Weights of the current step follow the square function
-        start = list(range(4, len(self.df.loc[:, 'Open'].values)))
+        start = list(range(4, len(self.df.loc[:, 'Open'].values) - static.MAX_STEPS))
         weights = [i**2 for i in start]
         self.current_step = random.choices(start, weights)[0]
         self.start_step = self.current_step
@@ -108,10 +108,6 @@ class CryptoEnv(gym.Env):
         self._take_action(action)
 
         self.current_step += 1
-
-        # May be change the place of this
-        if self.current_step > len(self.df.loc[:, 'Open'].values) - 1:
-            done = True
 
         # Calculus of the reward
         delay_modifier = (self.current_step -
