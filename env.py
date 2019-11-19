@@ -109,10 +109,9 @@ class CryptoEnv(gym.Env):
 
         self.current_step += 1
 
+        # May be change the place of this
         if self.current_step > len(self.df.loc[:, 'Open'].values) - 1:
-            self.current_step = random.randint(
-                0,
-                len(self.df.loc[:, 'Open'].values) + 4)
+            done = True
 
         # Calculus of the reward
         delay_modifier = (self.current_step -
