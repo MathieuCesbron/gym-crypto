@@ -13,7 +13,7 @@ env = DummyVecEnv([lambda: CryptoEnv(df)])
 model = PPO2(MlpPolicy, env, verbose=1)
 
 # Train the agent
-model.learn(total_timesteps=1000)
+model.learn(total_timesteps=300000000)
 
 # Render the graph of rewards
 env.render(graph_reward=True)
@@ -24,7 +24,7 @@ env.render(graph_reward=True)
 # Trained agent performence
 obs = env.reset()
 env.render()
-for i in range(1000):
+for i in range(10000):
     action, _states = model.predict(obs)
     obs, rewards, done, info = env.step(action)
     env.render(print_step=True)
