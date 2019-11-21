@@ -4,6 +4,9 @@ import random
 from gym import spaces
 import static
 
+import matplotlib.pyplot as plt
+import matplotlib
+
 
 class CryptoEnv(gym.Env):
     def __init__(self, df, title=None):
@@ -16,6 +19,7 @@ class CryptoEnv(gym.Env):
         self.bnb_usdt_held = static.BNBUSDTHELD
         self.bnb_usdt_held_start = static.BNBUSDTHELD
         self.episode = 1
+        self.graph_to_render = []
         # Action space from -1 to 1, -1 is short, 1 is buy
         self.action_space = spaces.Box(low=-1,
                                        high=1,
@@ -47,7 +51,7 @@ class CryptoEnv(gym.Env):
         return self._next_observation()
 
     def _next_observation(self):
-        #Get the data for the last 5 timestep
+        # Get the data for the last 5 timestep
         frame = np.array([
             self.df.loc[self.current_step - 4:self.current_step, 'Open'],
             self.df.loc[self.current_step - 4:self.current_step, 'High'],
@@ -74,7 +78,7 @@ class CryptoEnv(gym.Env):
 
         return obs
 
-    def _take_action(self, action):  #pylint: disable=method-hidden
+    def _take_action(self, action):
         # Set the current price to a random price between open and close
         current_price = random.uniform(
             self.df.loc[self.current_step, 'Real open'],
@@ -124,6 +128,7 @@ class CryptoEnv(gym.Env):
         if done and render_episode:
             self.episode_reward = reward
             self._render_episode()
+            self.graph_to_render.append(reward)
             self.episode += 1
 
         obs = self._next_observation()
@@ -131,7 +136,7 @@ class CryptoEnv(gym.Env):
         # {} needed because gym wants 4 args
         return obs, reward, done, {}
 
-    def render(self):
+    def render(self, print_step=False, graph_reward=False, *args):
         profit = self.net_worth - (static.INITIAL_ACCOUNT_BALANCE +
                                    static.BNBUSDTHELD)
 
@@ -142,17 +147,25 @@ class CryptoEnv(gym.Env):
                             self.df.loc[self.start_step, 'Real open'] -
                             1) * 100
 
-        print("----------------------------------------")
-        print("Step: " + str(self.current_step))
-        print("Balance: " + str(round(self.balance, 2)))
-        print("Crypto held: " + str(round(self.crypto_held, 2)))
-        print("Fees paid: " + str(round(self.total_fees, 2)))
-        print("Volume traded: " + str(round(self.total_volume_traded, 2)))
-        print("Net worth: " + str(round(self.net_worth, 2)))
-        print("Max net worth: " + str(round(self.max_net_worth, 2)))
-        print("Profit: " + str(round(profit_percent, 2)) +
-              "% ({})".format(round(profit, 2)))
-        print("Benchmark profit : " + str(round(benchmark_profit, 2)) + "%")
+        if print_step:
+            print("----------------------------------------")
+            print(f'Step: {self.current_step}')
+            print(f'Balance: {round(self.balance, 2)}')
+            print(f'Crypto held: {round(self.crypto_held, 2)}')
+            print(f'Fees paid: {round(self.total_fees, 2)}')
+            print(f'Volume traded: {round(self.total_volume_traded, 2)}')
+            print(f'Net worth: {round(self.max_net_worth, 2)}')
+            print(f'Max net worth: {round(self.max_net_worth, 2)}')
+            print(f'Profit: {round(profit_percent, 2)}% ({round(profit, 2)})')
+            print(f'Benchmark profit: {round(benchmark_profit, 2)}')
+
+        # Plot the graph of the reward
+        if graph_reward:
+            plt.xlabel = ('Episodes')
+            plt.ylabel = ('Reward')
+            plt.plot(self.graph_to_render)
+            plt.savefig('graphreward.png')
+            plt.show()
 
         return profit_percent, benchmark_profit
 
