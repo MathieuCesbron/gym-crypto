@@ -3,3 +3,4 @@ __pycache__/
 data/*
 data/BTCUSDT.csv
 render.txt
+venv/
