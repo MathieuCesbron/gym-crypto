@@ -1,7 +1,7 @@
 .vscode/
 __pycache__/
 data/*
-data/BTCUSDT.csv
+render/*
 render.txt
 venv/
 graphreward.png
