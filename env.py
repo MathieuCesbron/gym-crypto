@@ -169,7 +169,7 @@ class CryptoEnv(gym.Env):
 
         return profit_percent, benchmark_profit
 
-    def _render_episode(self, filename='render.txt'):
+    def _render_episode(self, filename='render/render.txt'):
         file = open(filename, 'a')
         file.write('-----------------------\n')
         file.write(f'Episode numero: {self.episode}\n')
