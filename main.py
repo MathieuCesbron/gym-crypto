@@ -4,6 +4,7 @@ from stable_baselines import PPO2
 
 from env import CryptoEnv
 import pandas as pd
+import os
 
 df = pd.read_csv('data/BTCUSDT.csv')
 
@@ -13,7 +14,7 @@ env = DummyVecEnv([lambda: CryptoEnv(df)])
 model = PPO2(MlpPolicy, env, verbose=1)
 
 # Train the agent
-model.learn(total_timesteps=300000000)
+model.learn(total_timesteps=3000)
 
 # Render the graph of rewards
 env.render(graph_reward=True)
