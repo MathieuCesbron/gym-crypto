@@ -4,3 +4,5 @@ __pycache__/
 render.txt
 venv/
 graphreward.png
+Dockerfile
+.dockerignore
