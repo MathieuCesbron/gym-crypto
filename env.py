@@ -164,7 +164,7 @@ class CryptoEnv(gym.Env):
             plt.xlabel = ('Episodes')
             plt.ylabel = ('Reward')
             plt.plot(self.graph_to_render)
-            plt.savefig('graphreward.png')
+            plt.savefig('render/graphreward.png')
             plt.show()
 
         return profit_percent, benchmark_profit
