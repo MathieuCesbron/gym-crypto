@@ -1,7 +1,6 @@
 .vscode/
 __pycache__/
-data/*
-render/*
+*.csv
 render.txt
 venv/
 graphreward.png
