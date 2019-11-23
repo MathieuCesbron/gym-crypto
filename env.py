@@ -67,16 +67,13 @@ class CryptoEnv(gym.Env):
             self.df.loc[self.current_step -
                         4:self.current_step, 'Taker buy quote asset volume']
         ])
-
-        # We will Append additional data to render after
+        # We append additional data
         obs = np.append(frame, [[
             self.balance / static.MAX_ACCOUNT_BALANCE, self.net_worth /
             self.max_net_worth, self.crypto_held / static.MAX_CRYPTO,
             self.bnb_usdt_held / self.bnb_usdt_held_start, 0
         ]],
                         axis=0)
-
-        print(self.current_step)
         return obs
 
     def _take_action(self, action):

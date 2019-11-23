@@ -11,7 +11,7 @@ df = pd.read_csv('data/BTCUSDT.csv')
 env = DummyVecEnv([lambda: CryptoEnv(df)])
 
 # Instanciate the agent
-model = PPO2(MlpPolicy, env, verbose=1)
+model = PPO2(MlpPolicy, env, gamma=1, learning_rate=0.01, verbose=1)
 
 # Train the agent
 total_timesteps = int(os.getenv('TOTAL_TIMESTEPS', 1000000))
