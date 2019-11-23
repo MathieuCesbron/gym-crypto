@@ -25,7 +25,7 @@ env.render(graph_reward=True)
 # Trained agent performence
 obs = env.reset()
 env.render()
-for i in range(10000):
+for i in range(1100):
     action, _states = model.predict(obs)
     obs, rewards, done, info = env.step(action)
     env.render(print_step=True)

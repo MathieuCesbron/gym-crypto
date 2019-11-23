@@ -6,3 +6,4 @@ venv/
 graphreward.png
 Dockerfile
 .dockerignore
+docker-compose.yml
