@@ -76,6 +76,7 @@ class CryptoEnv(gym.Env):
         ]],
                         axis=0)
 
+        print(self.current_step)
         return obs
 
     def _take_action(self, action):
@@ -107,25 +108,26 @@ class CryptoEnv(gym.Env):
         if self.net_worth > self.max_net_worth:
             self.max_net_worth = self.net_worth
 
-    def step(self, action, render_episode=True):
+    def step(self, action, end=True):
         # Execute one time step within the environment
         self._take_action(action)
 
         self.current_step += 1
 
         # Calculus of the reward
-        delay_modifier = (self.current_step -
-                          self.start_step) / static.MAX_STEPS
-
         profit = self.net_worth - (static.INITIAL_ACCOUNT_BALANCE +
                                    static.BNBUSDTHELD)
-
-        reward = profit * delay_modifier
+        reward = profit
 
         # A single episode can last a maximum of MAX_STEPS steps
-        done = self.net_worth <= 0 or self.bnb_usdt_held <= 0 or delay_modifier >= 1
+        if self.current_step >= static.MAX_STEPS + self.start_step:
+            end = True
+        else:
+            end = False
 
-        if done and render_episode:
+        done = self.net_worth <= 0 or self.bnb_usdt_held <= 0 or end
+
+        if done and end:
             self.episode_reward = reward
             self._render_episode()
             self.graph_to_render.append(reward)

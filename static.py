@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 
 df = pd.read_csv('data/BTCUSDT.csv')
 
@@ -21,4 +22,4 @@ MAX_CRYPTO = 21000000
 MAKER_FEE = 0.00075
 TAKER_FEE = 0.00075
 BNBUSDTHELD = 1000
-MAX_STEPS = 1000
+MAX_STEPS = int(os.getenv('MAX_STEPS', 1000))
