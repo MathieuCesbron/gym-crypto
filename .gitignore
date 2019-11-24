@@ -7,3 +7,4 @@ graphreward.png
 Dockerfile
 .dockerignore
 docker-compose.yml
+*.zip
