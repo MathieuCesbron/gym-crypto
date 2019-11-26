@@ -68,12 +68,13 @@ class CryptoEnv(gym.Env):
                         4:self.current_step, 'Taker buy quote asset volume']
         ])
         # We append additional data
-        obs = np.append(frame, [[
-            self.balance / static.MAX_ACCOUNT_BALANCE, self.net_worth /
-            self.max_net_worth, self.crypto_held / static.MAX_CRYPTO,
-            self.bnb_usdt_held / self.bnb_usdt_held_start, 0
-        ]],
-                        axis=0)
+        obs = np.append(frame, [[self.balance / static.MAX_ACCOUNT_BALANCE,
+                                 self.net_worth / self.max_net_worth,
+                                 self.crypto_held / static.MAX_CRYPTO,
+                                 self.bnb_usdt_held / self.bnb_usdt_held_start,
+                                 0]],
+                                 axis=0)
+
         return obs
 
     def _take_action(self, action):
