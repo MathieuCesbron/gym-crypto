@@ -4,3 +4,4 @@ pandas
 numpy
 gym
 matplotlib
+mpi4py
