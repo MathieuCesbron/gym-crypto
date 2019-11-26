@@ -7,12 +7,12 @@ import pandas as pd
 import os
 
 policies = [MlpPolicy, LnMlpPolicy]
-df = pd.read_csv('data/BTCUSDT.csv')
+df = pd.read_csv('data/BTCUSDT.csv', index_col=0)
 one_day_data = df.loc[1000:2440]
 
 max_timesteps = 10000
 
-env = DummyVecEnv([lambda: CryptoEnv(one_day_data)])
+env = DummyVecEnv([lambda: CryptoEnv(df)])
 
 for pi in policies:
 
