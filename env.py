@@ -176,7 +176,7 @@ class CryptoEnv(gym.Env):
         # Plot the graph of the reward
         if graph:
             fig = plt.figure()
-            fig.suptitle('Graph of the training')
+            fig.suptitle('Training graph')
             
             high = plt.subplot(2, 1, 1)
             high.set(ylabel='Gain')
