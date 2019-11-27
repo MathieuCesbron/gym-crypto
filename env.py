@@ -19,7 +19,12 @@ class CryptoEnv(gym.Env):
         self.bnb_usdt_held = static.BNBUSDTHELD
         self.bnb_usdt_held_start = static.BNBUSDTHELD
         self.episode = 1
-        self.graph_to_render = []
+
+        # Graph to render
+        self.graph_reward = []
+        self.graph_profit = []
+        self.graph_benchmark = []
+
         # Action space from -1 to 1, -1 is short, 1 is buy
         self.action_space = spaces.Box(low=-1,
                                        high=1,
@@ -115,6 +120,13 @@ class CryptoEnv(gym.Env):
         # Calculus of the reward
         profit = self.net_worth - (static.INITIAL_ACCOUNT_BALANCE +
                                    static.BNBUSDTHELD)
+
+        profit_percent = profit / (static.INITIAL_ACCOUNT_BALANCE +
+                                   static.BNBUSDTHELD) * 100
+
+        benchmark_profit = (self.df.loc[self.current_step, 'Real open'] /
+                            self.df.loc[self.start_step, 'Real open'] -
+                            1) * 100
         reward = profit
 
         # A single episode can last a maximum of MAX_STEPS steps
@@ -128,7 +140,9 @@ class CryptoEnv(gym.Env):
         if done and end:
             self.episode_reward = reward
             self._render_episode()
-            self.graph_to_render.append(reward)
+            self.graph_profit.append(profit_percent)
+            self.graph_benchmark.append(benchmark_profit)
+            self.graph_reward.append(reward)
             self.episode += 1
 
         obs = self._next_observation()
@@ -136,7 +150,7 @@ class CryptoEnv(gym.Env):
         # {} needed because gym wants 4 args
         return obs, reward, done, {}
 
-    def render(self, print_step=False, graph_reward=False, *args):
+    def render(self, print_step=False, graph=False, *args):
         profit = self.net_worth - (static.INITIAL_ACCOUNT_BALANCE +
                                    static.BNBUSDTHELD)
 
@@ -160,11 +174,20 @@ class CryptoEnv(gym.Env):
             print(f'Benchmark profit: {round(benchmark_profit, 2)}')
 
         # Plot the graph of the reward
-        if graph_reward:
-            plt.xlabel = ('Episodes')
-            plt.ylabel = ('Reward')
-            plt.plot(self.graph_to_render)
-            plt.savefig('render/graphreward.png')
+        if graph:
+            fig = plt.figure()
+            fig.suptitle('Graph of the training')
+            
+            high = plt.subplot(2, 1, 1)
+            high.set(ylabel='Gain')
+            plt.plot(self.graph_profit, label='Bot profit')
+            plt.plot(self.graph_benchmark, label='Benchmark profit')
+            high.legend(loc='upper left')
+
+            low = plt.subplot(2, 1, 2)
+            low.set(xlabel='Episode', ylabel='Reward')
+            plt.plot(self.graph_reward, label='reward')
+
             plt.show()
 
         return profit_percent, benchmark_profit
