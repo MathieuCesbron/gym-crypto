@@ -1,11 +1,9 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import gym
 import random
 from gym import spaces
 import static
-
-import matplotlib.pyplot as plt
-import matplotlib
 
 
 class CryptoEnv(gym.Env):
@@ -39,7 +37,8 @@ class CryptoEnv(gym.Env):
     def reset(self):
         self.balance = static.INITIAL_ACCOUNT_BALANCE
         self.net_worth = static.INITIAL_ACCOUNT_BALANCE + static.BNBUSDTHELD
-        self.max_net_worth = static.INITIAL_ACCOUNT_BALANCE + static.BNBUSDTHELD
+        self.max_net_worth = static.INITIAL_ACCOUNT_BALANCE
+        static.BNBUSDTHELD
         self.total_fees = 0
         self.total_volume_traded = 0
         self.crypto_held = 0
@@ -78,7 +77,7 @@ class CryptoEnv(gym.Env):
                                  self.crypto_held / static.MAX_CRYPTO,
                                  self.bnb_usdt_held / self.bnb_usdt_held_start,
                                  0]],
-                                 axis=0)
+                                axis=0)
 
         return obs
 
@@ -177,7 +176,7 @@ class CryptoEnv(gym.Env):
         if graph:
             fig = plt.figure()
             fig.suptitle('Training graph')
-            
+
             high = plt.subplot(2, 1, 1)
             high.set(ylabel='Gain')
             plt.plot(self.graph_profit, label='Bot profit')

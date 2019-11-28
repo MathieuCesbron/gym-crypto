@@ -14,7 +14,7 @@ env = DummyVecEnv([lambda: CryptoEnv(df)])
 model = PPO2(MlpPolicy, env, gamma=1, learning_rate=0.01, verbose=0)
 
 # Train the agent
-total_timesteps = int(os.getenv('TOTAL_TIMESTEPS', 10000))
+total_timesteps = int(os.getenv('TOTAL_TIMESTEPS', 500000))
 model.learn(total_timesteps)
 
 # Render the graph of rewards
